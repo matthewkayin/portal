@@ -3,6 +3,7 @@
 #endif
 
 #include "core/application.h"
+#include "core/logger.h"
 #include "core/input.h"
 #include <cstdio>
 
@@ -37,13 +38,13 @@ bool init() {
 
 void update(float delta) {
     if (input_is_input_just_pressed(INPUT_FORWARD)) {
-        printf("hey\n");
+        log_info("hey\n");
     }
     if (input_is_input_just_released(INPUT_FORWARD)) {
-        printf("ho\n");
+        log_info("ho\n");
     }
     if (input_is_input_just_pressed(INPUT_PORTAL_LEFT)) {
-        printf("hwey\n");
+        log_info("hwey\n");
     }
 }
 

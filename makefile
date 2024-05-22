@@ -6,9 +6,8 @@ BUILD_DIR := bin
 OBJ_DIR := obj
 COMPILER_FLAGS := -g -Wall -O0
 INCLUDE_FLAGS := -Isrc -Ivendor
-LINKER_FLAGS := -g -L$(LIB_DIR) -lSDL2 -lSDL2_ttf
-DEFINES := 
-
+LINKER_FLAGS := -g -L$(LIB_DIR) -luser32 -lSDL2 -lSDL2_ttf
+DEFINES := -D_CRT_SECURE_NO_WARNINGS
 
 # Make does not offer a recursive wildcard function, so here's one:
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))

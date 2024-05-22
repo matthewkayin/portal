@@ -1,6 +1,7 @@
 #include "application.h"
 
 #include "resource.h"
+#include "logger.h"
 #include "input.h"
 #include "renderer/renderer.h"
 #include <SDL2/SDL.h>
@@ -26,9 +27,11 @@ std::string resource_base_path;
 
 bool application_create(AppConfig config) {
     if (initialized) {
-        printf("application_create() called more than once.\n");
+        log_error("application_create() called more than once.");
         return false;
     }
+
+    logger_init();
 
     // Get info out of config
     app.init = config.init;
@@ -40,20 +43,20 @@ bool application_create(AppConfig config) {
 
     // Check to make sure config was valid
     if (!app.init || !app.update || !app.render) {
-        printf("Application function pointers not assigned!\n");
+        log_error("Application function pointers not assigned!");
         return false;
     }
 
     // Init SDL
     SDL_GL_LoadLibrary(NULL);
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        printf("SDL failed to initialize: %s", SDL_GetError());
+        log_error("SDL failed to initialize: %s", SDL_GetError());
     }
 
     // Create window
     app.window = SDL_CreateWindow(config.name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, app.window_size.x, app.window_size.y, SDL_WINDOW_OPENGL);
     if (app.window == NULL) {
-        printf("Error creating window: %s", SDL_GetError());
+        log_error("Error creating window: %s", SDL_GetError());
         return false;
     }
 
@@ -62,11 +65,11 @@ bool application_create(AppConfig config) {
     if (!renderer_init(app.window, app.screen_size, app.window_size)) { return false; }
 
     if (!app.init()) {
-        printf("Application failed to initialize.\n");
+        log_error("Application failed to initialize.");
         return false;
     }
 
-    printf("%s initialized.\n", config.name);
+    log_info("%s initialized.", config.name);
 
     return true;
 }
@@ -138,7 +141,8 @@ void application_run() {
 
     SDL_Quit();
 
-    printf("Application quit gracefully.\n");
+    log_info("Application quit gracefully.");
+    logger_quit();
 }
 
 uint32_t application_get_fps() {

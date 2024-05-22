@@ -1,6 +1,7 @@
 #include "shader.h"
 
 #include "core/resource.h"
+#include "core/logger.h"
 #include <glad/glad.h>
 #include <fstream>
 #include <string>
@@ -16,7 +17,7 @@ bool shader_compile(Shader* id, GLenum shader_type, const char* path) {
 
     shader_file.open(full_path);
     if (!shader_file.is_open()) {
-        printf("Error opening shader file at path %s\n", full_path.c_str());
+        log_error("Error opening shader file at path %s\n", full_path.c_str());
         return false;
     }
 
@@ -36,7 +37,7 @@ bool shader_compile(Shader* id, GLenum shader_type, const char* path) {
     if (!success) {
         char info_log[512];
         glGetShaderInfoLog(*id, 512, NULL, info_log);
-        printf("Shader %s failed to compile: %s\n", path, info_log);
+        log_error("Shader %s failed to compile: %s", path, info_log);
         return false;
     }
 
@@ -65,7 +66,7 @@ bool shader_load(Shader* id, const char* vertex_path, const char* fragment_path)
     if (!success) {
         char info_log[512];
         glGetProgramInfoLog(*id, 512, NULL, info_log);
-        printf("Failed linking shader program. Vertex: %s Fragment %s Error: %s\n", vertex_path, fragment_path, info_log);
+        log_error("Failed linking shader program. Vertex: %s Fragment %s Error: %s", vertex_path, fragment_path, info_log);
         return false;
     }
 

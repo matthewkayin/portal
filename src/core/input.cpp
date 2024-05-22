@@ -1,5 +1,6 @@
 #include "input.h"
 
+#include "logger.h"
 #include <cstdio>
 
 struct InputState {
@@ -14,7 +15,7 @@ static InputState input_state;
 
 void input_init() {
     memset(&input_state, 0, sizeof(InputState));
-    printf("Input subsystem initialized.\n");
+    log_info("Input subsystem initialized.");
 }
 
 void input_update() {

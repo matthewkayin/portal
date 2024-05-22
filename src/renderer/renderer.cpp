@@ -1,5 +1,6 @@
 #include "renderer.h"
 
+#include "core/logger.h"
 #include "shader.h"
 #include <SDL2/SDL.h>
 #include <glad/glad.h>
@@ -47,14 +48,14 @@ bool renderer_init(SDL_Window* window, ivec2 screen_size, ivec2 window_size) {
     // Create GL context
     state.context = SDL_GL_CreateContext(state.window);
     if (state.context == NULL) {
-        printf("Error creating GL context: %s\n", SDL_GetError());
+        log_error("Error creating GL context: %s", SDL_GetError());
         return false;
     }
 
     // Setup GLAD
     gladLoadGLLoader(SDL_GL_GetProcAddress);
     if (glGenVertexArrays == NULL) {
-        printf("Error loading OpenGL.\n");
+        log_error("Error loading OpenGL.");
         return false;
     }
 
@@ -82,7 +83,7 @@ bool renderer_init(SDL_Window* window, ivec2 screen_size, ivec2 window_size) {
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        printf("Screen framebuffer not complete!\n");
+        log_error("Screen framebuffer not complete!");
         return false;
     }
 
@@ -96,7 +97,7 @@ bool renderer_init(SDL_Window* window, ivec2 screen_size, ivec2 window_size) {
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, state.screen_intermediate_texture, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        printf("Screen intermediate framebuffer not complete!\n");
+        log_error("Screen intermediate framebuffer not complete!");
         return false;
     }
 
@@ -142,7 +143,7 @@ bool renderer_init(SDL_Window* window, ivec2 screen_size, ivec2 window_size) {
     shader_use(state.light_shader);
     shader_set_uniform_mat4(state.light_shader, "projection", &projection);
 
-    printf("Renderer subsystem initialized.");
+    log_info("Renderer subsystem initialized.");
     return true;
 }
 
