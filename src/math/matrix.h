@@ -47,6 +47,8 @@ struct mat4 {
         result[3][1] = -(top + bottom) / (top - bottom);
         result[3][2] = -(far + near) / (far - near);
         result[3][3] = 1.0f;
+
+        return result;
     }
 
     inline static mat4 perspective(float fov, float aspect, float near, float far) {

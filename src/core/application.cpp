@@ -2,6 +2,7 @@
 
 #include "resource.h"
 #include "input.h"
+#include "renderer/renderer.h"
 #include <SDL2/SDL.h>
 #include <cstdio>
 
@@ -9,6 +10,8 @@ static const uint64_t FRAME_TIME = (uint64_t)(1000.0 / 60.0);
 
 struct Application {
     SDL_Window* window;
+    ivec2 screen_size;
+    ivec2 window_size;
 
     uint32_t fps;
 
@@ -31,6 +34,8 @@ bool application_create(AppConfig config) {
     app.init = config.init;
     app.update = config.update;
     app.render = config.render;
+    app.screen_size = config.screen_size;
+    app.window_size = config.window_size;
     resource_base_path = std::string(config.resource_path);
 
     // Check to make sure config was valid
@@ -40,12 +45,13 @@ bool application_create(AppConfig config) {
     }
 
     // Init SDL
+    SDL_GL_LoadLibrary(NULL);
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL failed to initialize: %s", SDL_GetError());
     }
 
     // Create window
-    app.window = SDL_CreateWindow(config.name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, config.screen_width, config.screen_height, SDL_WINDOW_SHOWN);
+    app.window = SDL_CreateWindow(config.name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, app.window_size.x, app.window_size.y, SDL_WINDOW_OPENGL);
     if (app.window == NULL) {
         printf("Error creating window: %s", SDL_GetError());
         return false;
@@ -53,6 +59,7 @@ bool application_create(AppConfig config) {
 
     // Initialize subsystems
     input_init();
+    if (!renderer_init(app.window, app.screen_size, app.window_size)) { return false; }
 
     if (!app.init()) {
         printf("Application failed to initialize.\n");
@@ -110,7 +117,7 @@ void application_run() {
                     input_process_mouse_button(event.button.button, false);
                     break;
                 case SDL_MOUSEMOTION:
-                    input_process_mouse_motion(glm::ivec2(event.motion.x, event.motion.y), glm::ivec2(event.motion.xrel, event.motion.yrel));
+                    input_process_mouse_motion(ivec2(event.motion.x, event.motion.y), ivec2(event.motion.xrel, event.motion.yrel));
                     break;
             }
         }
@@ -119,8 +126,13 @@ void application_run() {
         app.update(delta);
         
         // Render
+        renderer_prepare_frame();
         app.render();
+        renderer_present_frame();
     }
+
+    // Quit subsystems
+    renderer_quit();
 
     SDL_DestroyWindow(app.window);
 

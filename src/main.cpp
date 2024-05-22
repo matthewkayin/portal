@@ -13,10 +13,10 @@ void render();
 int main() {
     AppConfig config = (AppConfig) {
         .name = "PORTAL",
-        .screen_width = 1280,
-        .screen_height = 720,
+        .screen_size = ivec2(1280, 720),
+        .window_size = ivec2(1280, 720),
         
-        .resource_path = "./res/",
+        .resource_path = "../res/",
 
         .init = &init,
         .update = &update,

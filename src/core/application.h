@@ -1,11 +1,12 @@
 #pragma once
 
+#include "math/vector2.h"
 #include <cstdint>
 
 struct AppConfig {
     const char* name;
-    int screen_width;
-    int screen_height;
+    ivec2 screen_size;
+    ivec2 window_size;
 
     const char* resource_path;
 
