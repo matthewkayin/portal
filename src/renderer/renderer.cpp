@@ -2,7 +2,6 @@
 
 #include "core/logger.h"
 #include "shader.h"
-#include <SDL2/SDL.h>
 #include <glad/glad.h>
 #include <cstdio>
 
@@ -307,4 +306,28 @@ void renderer_present_frame() {
     glBindVertexArray(0);
 
     SDL_GL_SwapWindow(state.window);
+}
+
+void renderer_set_camera(vec3 position, vec3 target) {
+    mat4 view = mat4::look_at(position, target, VEC3_UP);
+
+    shader_use(state.light_shader);
+    shader_set_uniform_mat4(state.light_shader, "view", &view);
+    shader_use(state.geometry_shader);
+    shader_set_uniform_mat4(state.geometry_shader, "view", &view);
+    shader_set_uniform_vec3(state.geometry_shader, "view_position", position);
+    shader_use(state.model_shader);
+    shader_set_uniform_mat4(state.model_shader, "view", &view);
+    shader_set_uniform_vec3(state.model_shader, "view_position", position);
+}
+
+void renderer_render_light(vec3 position) {
+    shader_use(state.light_shader);
+
+    mat4 model = mat4::translate(position) * mat4::scale(vec3(0.1f));
+    shader_set_uniform_mat4(state.light_shader, "model", &model);
+
+    glBindVertexArray(state.cube_vao);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
 }

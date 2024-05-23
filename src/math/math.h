@@ -16,3 +16,13 @@ inline float deg_to_rad(float degrees) {
 inline float rad_to_deg(float radians) {
     return radians * MATH_RAD2DEG_MULTIPLIER;
 }
+
+inline float clampf(float value, float lower, float upper) {
+    if (value < lower) {
+        return lower;
+    }
+    if (value > upper) {
+        return upper;
+    }
+    return value;
+}

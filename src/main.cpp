@@ -5,11 +5,8 @@
 #include "core/application.h"
 #include "core/logger.h"
 #include "core/input.h"
+#include "scene/scene.h"
 #include <cstdio>
-
-bool init();
-void update(float delta);
-void render();
 
 int main() {
     AppConfig config = (AppConfig) {
@@ -19,9 +16,9 @@ int main() {
         
         .resource_path = "../res/",
 
-        .init = &init,
-        .update = &update,
-        .render = &render
+        .init = &scene_init,
+        .update = &scene_update,
+        .render = &scene_render
     };
     if (!application_create(config)) {
         return -1;
@@ -30,24 +27,4 @@ int main() {
     application_run();
 
     return 0;
-}
-
-bool init() {
-    return true;
-}
-
-void update(float delta) {
-    if (input_is_input_just_pressed(INPUT_FORWARD)) {
-        log_info("hey\n");
-    }
-    if (input_is_input_just_released(INPUT_FORWARD)) {
-        log_info("ho\n");
-    }
-    if (input_is_input_just_pressed(INPUT_PORTAL_LEFT)) {
-        log_info("hwey\n");
-    }
-}
-
-void render() {
-
 }

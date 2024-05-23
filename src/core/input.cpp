@@ -47,15 +47,15 @@ void input_process_mouse_motion(ivec2 mouse_position, ivec2 mouse_relative_posit
     input_state.mouse_relative_position = mouse_relative_position;
 }
 
-bool input_is_input_pressed(Input input) {
+bool input_is_action_pressed(Input input) {
     return input_state.current[input];
 }
 
-bool input_is_input_just_pressed(Input input) {
+bool input_is_action_just_pressed(Input input) {
     return input_state.current[input] && !input_state.previous[input];
 }
 
-bool input_is_input_just_released(Input input) {
+bool input_is_action_just_released(Input input) {
     return !input_state.current[input] && input_state.previous[input];
 }
 

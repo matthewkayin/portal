@@ -27,7 +27,10 @@ void logger_quit() {
 }
 
 void log_out(LogLevel level, const char* message, ...) {
-    const char* level_prefix[4] = {"[ERROR]: ", "[WARN]: ", "[INFO]: ", "[TRACE]: "};
+    const char* level_prefix[4] = {"[ERROR]: ", 
+                                   "[WARN]:  ", 
+                                   "[INFO]:  ", 
+                                   "[TRACE]: "};
     bool is_error = level == LOG_LEVEL_ERROR;
 
     const int MESSAGE_LENGTH = 32000;
