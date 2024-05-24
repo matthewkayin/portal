@@ -258,6 +258,10 @@ void renderer_quit() {
     SDL_GL_DeleteContext(state.context);
 }
 
+void renderer_set_clear_color(vec3 clear_color) {
+    state.clear_color = clear_color;
+}
+
 void renderer_prepare_frame() {
     glBindFramebuffer(GL_FRAMEBUFFER, state.screen_framebuffer);
     glViewport(0, 0, state.screen_size.x, state.screen_size.y);

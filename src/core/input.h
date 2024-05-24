@@ -14,6 +14,7 @@ enum Input {
     INPUT_PORTAL_LEFT,
     INPUT_PORTAL_RIGHT,
     INPUT_ESCAPE,
+    INPUT_TILDE,
     INPUT_COUNT
 };
 
@@ -24,7 +25,8 @@ const std::unordered_map<SDL_Keycode, Input> input_key_to_input_map {
     { SDLK_a, INPUT_LEFT },
     { SDLK_SPACE, INPUT_JUMP },
     { SDLK_LCTRL, INPUT_CROUCH },
-    { SDLK_ESCAPE, INPUT_ESCAPE }
+    { SDLK_ESCAPE, INPUT_ESCAPE },
+    { SDLK_BACKQUOTE, INPUT_TILDE }
 };
 
 const std::unordered_map<uint8_t, Input> input_mouse_button_to_input_map {

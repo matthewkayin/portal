@@ -1,11 +1,12 @@
-#include "scene.h"
+#include "level.h"
 
 #include "core/logger.h"
 #include "core/application.h"
 #include "core/input.h"
 #include "renderer/renderer.h"
+#include "states/states.h"
 
-struct State {
+struct LevelState {
     // Player
     vec3 player_position;
     vec3 player_direction;
@@ -16,9 +17,9 @@ struct State {
     vec3 light_position;
 };
 
-static State state;
+static LevelState state;
 
-bool scene_init() {
+bool level_init() {
     // Initialize player
     state.player_position = vec3(0.0f);
     state.player_camera_yaw = deg_to_rad(-90.0f);
@@ -29,10 +30,18 @@ bool scene_init() {
     return true;
 }
 
-void scene_update(float delta) {
+void level_on_switch(void* switch_params) {
+    renderer_set_clear_color(vec3(0.2f, 0.2f, 0.2f));
+}
+
+void level_update(float delta) {
     static const float CAMERA_PITCH_LIMIT = deg_to_rad(89.0f);
     static const float CAMERA_SPEED = 0.1f;
     static const float PLAYER_SPEED = 5.0f;
+
+    if (input_is_action_just_pressed(INPUT_TILDE)) {
+        application_set_state(STATE_EDITOR, nullptr);
+    }
 
     // Player input
     ivec2 player_move_input = ivec2(0, 0);
@@ -76,7 +85,7 @@ void scene_update(float delta) {
     state.player_position += player_velocity * delta;
 }
 
-void scene_render() {
+void level_render() {
     renderer_set_camera(state.player_position, state.player_position + state.player_direction);
     renderer_render_light(state.light_position);
 }

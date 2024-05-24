@@ -5,7 +5,7 @@
 #include "core/application.h"
 #include "core/logger.h"
 #include "core/input.h"
-#include "scene/scene.h"
+#include "states/app_states.h"
 #include <cstdio>
 
 int main() {
@@ -15,16 +15,16 @@ int main() {
         .window_size = ivec2(1280, 720),
         
         .resource_path = "../res/",
-
-        .init = &scene_init,
-        .update = &scene_update,
-        .render = &scene_render
     };
     if (!application_create(config)) {
         return -1;
     }
 
-    application_run();
+    for (int state_id = 0; state_id < STATE_COUNT; state_id++) {
+        application_register_state(state_id, app_states.at((State)state_id));
+    }
+
+    application_run(STATE_LEVEL);
 
     return 0;
 }

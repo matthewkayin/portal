@@ -6,8 +6,10 @@
 #include "renderer/renderer.h"
 #include <SDL2/SDL.h>
 #include <cstdio>
+#include <unordered_map>
 
 static const uint64_t FRAME_TIME = (uint64_t)(1000.0 / 60.0);
+static const int APP_STATE_NONE = -1;
 
 struct Application {
     SDL_Window* window;
@@ -15,9 +17,8 @@ struct Application {
 
     uint32_t fps;
 
-    bool (*init)();
-    void (*update)(float delta);
-    void (*render)();
+    int state_id;
+    std::unordered_map<int, AppState> states;
 };
 
 static bool initialized = false;
@@ -33,16 +34,10 @@ bool application_create(AppConfig config) {
     logger_init();
 
     // Get info out of config
-    app.init = config.init;
-    app.update = config.update;
-    app.render = config.render;
     resource_base_path = std::string(config.resource_path);
 
-    // Check to make sure config was valid
-    if (!app.init || !app.update || !app.render) {
-        log_error("Application function pointers not assigned!");
-        return false;
-    }
+    // Initialize other fields
+    app.state_id = APP_STATE_NONE;
 
     // Init SDL
     SDL_GL_LoadLibrary(NULL);
@@ -61,17 +56,53 @@ bool application_create(AppConfig config) {
     input_init();
     if (!renderer_init(app.window, config.screen_size, config.window_size)) { return false; }
 
-    if (!app.init()) {
-        log_error("Application failed to initialize.");
-        return false;
-    }
-
     log_info("%s initialized.", config.name);
 
     return true;
 }
 
-void application_run() {
+bool application_register_state(int state_id, AppState app_state) {
+    // Check that the state pointers are filled out
+    if (!app_state.on_init || !app_state.on_switch || !app_state.update || !app_state.render) {
+        log_error("application_register_state(): Function pointers are not filled out for app state with id %i", state_id);
+        return false;
+    }
+
+    // Check to make sure the state hasn't already been registered
+    if (app.states.find(state_id) != app.states.end()) {
+        log_error("application_register_state(): State with id %i has already been registered.", state_id);
+        return false;
+    }
+
+    // Initialize the state
+    if (!app_state.on_init()) {
+        log_error("application_register_state(): State with id %i did not initialize successfully.", state_id);
+        return false;
+    }
+
+    // Put the state in the states list
+    app.states[state_id] = app_state;
+
+    return true;
+}
+
+void application_set_state(int state_id, void* switch_params) {
+    if (app.states.find(state_id) == app.states.end()) {
+        log_error("Cannot switch state. The state id %i does not exist.", state_id);
+        return;
+    }
+
+    app.state_id = state_id;
+    app.states[app.state_id].on_switch(switch_params);
+}
+
+void application_run(int initial_state_id) {
+    if (app.states.find(initial_state_id) == app.states.end()) {
+        log_error("Cannot run application. The initial state id %i does not exist.", initial_state_id);
+        return;
+    }
+
+    app.state_id = initial_state_id;
     bool is_running = true;
     uint64_t last_time = SDL_GetTicks();
     uint64_t last_second = last_time;
@@ -123,11 +154,11 @@ void application_run() {
         }
 
         // Update
-        app.update(delta);
+        app.states[app.state_id].update(delta);
         
         // Render
         renderer_prepare_frame();
-        app.render();
+        app.states[app.state_id].render();
         renderer_present_frame();
     }
 

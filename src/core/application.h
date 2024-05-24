@@ -13,7 +13,13 @@ struct AppConfig {
     bool (*init)();
     void (*update)(float delta);
     void (*render)();
+};
 
+struct AppState {
+    bool (*on_init)();
+    void (*on_switch)(void* switch_params);
+    void (*update)(float delta);
+    void (*render)();
 };
 
 enum AppMouseMode {
@@ -22,7 +28,9 @@ enum AppMouseMode {
 };
 
 bool application_create(AppConfig config);
-void application_run();
+bool application_register_state(int state_id, AppState app_state);
+void application_set_state(int state_id, void* switch_params);
+void application_run(int initial_state_id);
 uint32_t application_get_fps();
 
 AppMouseMode application_get_mouse_mode();
