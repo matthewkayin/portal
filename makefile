@@ -1,4 +1,4 @@
-ifeq ($(OS),WINDOWS_NT)
+ifeq ($(OS),Windows_NT)
 	PLATFORM := WIN32
 else
 	UNAME_S := $(shell uname -s)
@@ -18,7 +18,7 @@ INCLUDE_FLAGS := -Isrc -Ivendor
 LINKER_FLAGS := -g -L$(LIB_DIR) -lSDL2 -lSDL2_ttf
 DEFINES := -D_CRT_SECURE_NO_WARNINGS
 
-ifeq (PLATFORM,WIN32)
+ifeq ($(PLATFORM),WIN32)
 	EXTENSION := .exe
 	LINKER_FLAGS += -luser32
 
@@ -42,7 +42,7 @@ all: scaffold compile link
 .PHONY: scaffold
 scaffold:
 	@echo Scaffolding...
-ifeq (PLATFORM,WIN32)
+ifeq ($(PLATFORM),WIN32)
 	-@setlocal enableextensions enabledelayedexpansion && mkdir $(addprefix $(OBJ_DIR), $(DIRECTORIES)) 2>NUL || cd .
 	-@setlocal enableextensions enabledelayedexpansion && mkdir $(BUILD_DIR) 2>NUL || cd .
 	-@setlocal enableextensions enabledelayedexpansion && copy $(LIB_DIR) $(BUILD_DIR)
@@ -55,7 +55,7 @@ endif
 .PHONY: link
 link: scaffold $(OBJ_FILES) # link
 	@echo Linking $(ASSEMBLY)...
-ifeq (PLATFORM,WIN32)
+ifeq ($(PLATFORM),WIN32)
 	@clang++ $(OBJ_FILES) -o $(BUILD_DIR)\$(ASSEMBLY)$(EXTENSION) $(LINKER_FLAGS)
 else
 	@clang++ $(OBJ_FILES) -o $(BUILD_DIR)/$(ASSEMBLY)$(EXTENSION) $(LINKER_FLAGS)
@@ -67,7 +67,7 @@ compile: #compile .c files
 
 .PHONY: clean
 clean: # clean build directory
-ifeq (PLATFORM,WIN32)
+ifeq ($(PLATFORM),WIN32)
 	if exist $(BUILD_DIR)\$(ASSEMBLY)$(EXTENSION) del $(BUILD_DIR)\$(ASSEMBLY)$(EXTENSION)
 	rmdir /s /q $(OBJ_DIR)
 else
