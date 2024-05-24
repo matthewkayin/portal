@@ -6,7 +6,7 @@
 #include "core/application.h"
 #include <unordered_map>
 
-static const std::unordered_map<State, AppState> app_states = {
+static const std::unordered_map<int, AppState> app_states = {
     { STATE_LEVEL, (AppState) {
         .on_init = &level_init,
         .on_switch = &level_on_switch,

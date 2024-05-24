@@ -3,14 +3,23 @@
     "configurations": [
         {
             "name": "(Windows) Launch",
-            "type": "cppvsdbg",
+            "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/portal.exe",
+            "program": "${workspaceFolder}/bin/portal",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/bin",
             "environment": [],
-            "console":"newExternalWindow",
+            "windows": {
+                "type": "cppvsdbg",
+                "program": "${workspaceFolder}/bin/portal.exe",
+                "console": "integratedTerminal"
+            },
+            "osx": {
+                "MIMode": "lldb",
+                "targetArchitecture": "arm64",
+                "externalConsole": false,
+            }
         }
     ]
 }

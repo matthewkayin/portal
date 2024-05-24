@@ -18,7 +18,7 @@ enum Input {
     INPUT_COUNT
 };
 
-const std::unordered_map<SDL_Keycode, Input> input_key_to_input_map {
+static const std::unordered_map<SDL_Keycode, Input> input_key_to_input_map {
     { SDLK_w, INPUT_FORWARD },
     { SDLK_d, INPUT_RIGHT },
     { SDLK_s, INPUT_BACK },
@@ -29,7 +29,7 @@ const std::unordered_map<SDL_Keycode, Input> input_key_to_input_map {
     { SDLK_BACKQUOTE, INPUT_TILDE }
 };
 
-const std::unordered_map<uint8_t, Input> input_mouse_button_to_input_map {
+static const std::unordered_map<uint8_t, Input> input_mouse_button_to_input_map {
     { SDL_BUTTON_LEFT, INPUT_PORTAL_LEFT },
     { SDL_BUTTON_RIGHT, INPUT_PORTAL_RIGHT },
 };

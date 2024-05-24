@@ -7,8 +7,8 @@
 #include <cstdint>
 #include <cstdio>
 
-void logger_console_write(const char* message, uint8_t color);
-void logger_console_write_error(const char* message, uint8_t color);
+void platform_console_write(const char* message, uint8_t color);
+void platform_console_write_error(const char* message, uint8_t color);
 
 static FILE* logfile;
 
@@ -136,9 +136,9 @@ void log_out(LogLevel level, const char* message, ...) {
     sprintf(log_message, "%s%s\n", level_prefix[level], out_message);
 
     if (is_error) {
-        logger_console_write_error(log_message, level);
+        platform_console_write_error(log_message, level);
     } else {
-        logger_console_write(log_message, level);
+        platform_console_write(log_message, level);
     }
 
     fprintf(logfile, "%s", log_message);
@@ -152,7 +152,7 @@ void log_out(LogLevel level, const char* message, ...) {
 
 #include <windows.h>
 
-void logger_console_write(const char* message, uint8_t color) {
+void platform_console_write(const char* message, uint8_t color) {
     HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
     // ERROR, WARN, INFO, TRACE
     static uint8_t levels[6] = { 4, 6, 2, 8 };
@@ -163,7 +163,7 @@ void logger_console_write(const char* message, uint8_t color) {
     WriteConsoleA(GetStdHandle(STD_OUTPUT_HANDLE), message, (DWORD)length, number_written, 0);
 }
 
-void logger_console_write_error(const char* message, uint8_t color) {
+void platform_console_write_error(const char* message, uint8_t color) {
     HANDLE console_handle = GetStdHandle(STD_ERROR_HANDLE);
     // ERROR, WARN, INFO, TRACE
     static uint8_t levels[6] = { 4, 6, 2, 8 };
@@ -179,13 +179,13 @@ void logger_console_write_error(const char* message, uint8_t color) {
 void platform_console_write(const char* message, uint8_t color) {
     // ERROR,WARN,INFO,TRACE
     const char* colour_strings[] = {"1;31", "1;33", "1;32", "1;30"};
-    printf("\033[%sm%s\033[0m", colour_strings[colour], message);
+    printf("\033[%sm%s\033[0m", colour_strings[color], message);
 }
 
 void platform_console_write_error(const char* message, uint8_t color) {
     // ERROR,WARN,INFO,TRACE
     const char* colour_strings[] = {"1;31", "1;33", "1;32", "1;30"};
-    fprintf(stderr, "\033[%sm%s\033[0m", colour_strings[colour], message);
+    fprintf(stderr, "\033[%sm%s\033[0m", colour_strings[color], message);
 }
 
 #endif

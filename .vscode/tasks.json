@@ -6,8 +6,8 @@
             "windows": {
                 "command": "make"
             },
-            "linux": {
-                "command": "${workspaceFolder}/build-all.sh"
+            "osx": {
+                "command": "make"
             },
             "options": {
                 "cwd": "${workspaceFolder}"
