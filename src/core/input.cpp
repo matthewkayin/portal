@@ -21,7 +21,7 @@ void input_init() {
 void input_update() {
     input_state.mouse_relative_position = ivec2(0, 0);
 
-    memcpy(&input_state.current, &input_state.previous, sizeof(bool) * INPUT_COUNT);
+    memcpy(&input_state.previous, &input_state.current, sizeof(bool) * INPUT_COUNT);
 }
 
 void input_process_key(SDL_Keycode key, bool pressed) {
