@@ -4,6 +4,8 @@
 #include "vector3.h"
 #include "vector4.h"
 #include "matrix.h"
+#include "quaternion.h"
+#include "transform.h"
 
 #define MATH_PI 3.14159265358979323846f
 #define MATH_DEG2RAD_MULTIPLIER MATH_PI / 180.0f

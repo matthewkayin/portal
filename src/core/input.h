@@ -40,6 +40,7 @@ void input_update();
 void input_process_key(SDL_Keycode key, bool pressed);
 void input_process_mouse_button(uint8_t button, bool pressed);
 void input_process_mouse_motion(ivec2 mouse_position, ivec2 mouse_relative_position);
+void input_process_mouse_wheel_motion(int motion);
 
 bool input_is_action_pressed(Input input);
 bool input_is_action_just_pressed(Input input);
@@ -47,3 +48,4 @@ bool input_is_action_just_released(Input input);
 
 ivec2 input_get_mouse_position();
 ivec2 input_get_mouse_relative_position();
+int input_get_mouse_wheel_motion();

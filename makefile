@@ -13,7 +13,7 @@ DIR := $(subst /,\,${CURDIR})
 LIB_DIR := lib
 BUILD_DIR := bin
 OBJ_DIR := obj
-COMPILER_FLAGS := -g -std=c++11 -Wall -O0
+COMPILER_FLAGS := -g -std=c++17 -Wall -O0
 INCLUDE_FLAGS := -Isrc -Ivendor
 LINKER_FLAGS := -g -L$(LIB_DIR) -lSDL2 -lSDL2_ttf
 DEFINES := -D_CRT_SECURE_NO_WARNINGS

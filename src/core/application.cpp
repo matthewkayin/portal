@@ -150,6 +150,9 @@ void application_run(int initial_state_id) {
                 case SDL_MOUSEMOTION:
                     input_process_mouse_motion(ivec2(event.motion.x, event.motion.y), ivec2(event.motion.xrel, event.motion.yrel));
                     break;
+                case SDL_MOUSEWHEEL:
+                    input_process_mouse_wheel_motion(event.wheel.y);
+                    break;
             }
         }
 

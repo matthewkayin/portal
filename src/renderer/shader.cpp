@@ -84,6 +84,10 @@ void shader_set_uniform_int(Shader id, const char* name, int value) {
     glUniform1i(glGetUniformLocation(id, name), value);
 }
 
+void shader_set_uniform_int_array(Shader id, const char* name, int* value, int count) {
+    glUniform1iv(glGetUniformLocation(id, name), count, value);
+}
+
 void shader_set_uniform_uint(Shader id, const char* name, uint32_t value) {
     glUniform1ui(glGetUniformLocation(id, name), value);
 }

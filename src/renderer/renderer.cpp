@@ -4,6 +4,7 @@
 #include "shader.h"
 #include <glad/glad.h>
 #include <cstdio>
+#include <vector>
 
 struct RendererState {
     SDL_Window* window; // Pointer to the window, but it "belongs" in application
@@ -17,6 +18,7 @@ struct RendererState {
     uint32_t quad_vao;
     uint32_t glyph_vao;
     uint32_t cube_vao;
+    uint32_t quad3d_vao;
 
     uint32_t screen_framebuffer;
     uint32_t screen_texture;
@@ -28,6 +30,7 @@ struct RendererState {
     Shader model_shader;
     Shader geometry_shader;
     Shader light_shader;
+    Shader editor_quad_shader;
 };
 
 static RendererState state;
@@ -169,6 +172,33 @@ bool renderer_init(SDL_Window* window, ivec2 screen_size, ivec2 window_size) {
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
+    // Setup quad3d VAO
+    float quad3d_vertices[] = {
+        // positions         //normals          // texCoords
+		-1.0f, 1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f,
+		-1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+        1.0f, -1.0f, 0.0f,   0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+        
+		-1.0f, 1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f,
+        1.0f, -1.0f, 0.0f,   0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+        1.0f,  1.0f, 0.0f,   0.0f, 0.0f, 1.0f,  1.0f, 1.0f
+    };
+
+    uint32_t quad3d_vbo;
+    glGenVertexArrays(1, &state.quad3d_vao);
+    glGenBuffers(1, &quad3d_vbo);
+    glBindVertexArray(state.quad3d_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, quad3d_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quad3d_vertices), quad3d_vertices, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+
+    // Done with vao setup
 	glBindVertexArray(0);
 
     // Setup framebuffer
@@ -250,6 +280,13 @@ bool renderer_init(SDL_Window* window, ivec2 screen_size, ivec2 window_size) {
     shader_use(state.light_shader);
     shader_set_uniform_mat4(state.light_shader, "projection", &projection);
 
+    if (!shader_load(&state.editor_quad_shader, "shader/editor_quad.vert.glsl", "shader/editor_quad.frag.glsl")) {
+        return false;
+    }
+    shader_use(state.editor_quad_shader);
+    shader_set_uniform_mat4(state.editor_quad_shader, "projection", &projection);
+    shader_set_uniform_int(state.editor_quad_shader, "material_albedo", 0);
+
     log_info("Renderer subsystem initialized.");
     return true;
 }
@@ -296,6 +333,27 @@ void renderer_present_frame() {
     SDL_GL_SwapWindow(state.window);
 }
 
+void renderer_set_lights(const RendererLight* lights, int light_count) {
+    if (light_count > 4) {
+        log_warn("Light count of %i is greater than supported max of 4.");
+        light_count = 4;
+    }
+
+    Shader shaders[2] = { state.geometry_shader, state.model_shader };
+    for (int shader_index = 0; shader_index < 2; shader_index++) {
+        Shader shader = shaders[shader_index];
+        shader_use(shader);
+        for (int i = 0; i < light_count; i++) {
+            char uniform_name[32];
+            sprintf(uniform_name, "light_positions[%i]", i);
+            shader_set_uniform_vec3(shader, uniform_name, lights[0].position);
+            sprintf(uniform_name, "light_colors[%i]", i);
+            shader_set_uniform_vec3(shader, uniform_name, lights[0].color);
+        }
+        shader_set_uniform_int(shader, "light_count", light_count);
+    }
+}
+
 void renderer_set_camera(vec3 position, vec3 target) {
     mat4 view = mat4::look_at(position, target, VEC3_UP);
 
@@ -307,6 +365,9 @@ void renderer_set_camera(vec3 position, vec3 target) {
     shader_use(state.model_shader);
     shader_set_uniform_mat4(state.model_shader, "view", &view);
     shader_set_uniform_vec3(state.model_shader, "view_position", position);
+    shader_use(state.editor_quad_shader);
+    shader_set_uniform_mat4(state.editor_quad_shader, "view", &view);
+    shader_set_uniform_vec3(state.editor_quad_shader, "view_position", position);
 }
 
 void renderer_render_light(vec3 position) {
@@ -317,5 +378,19 @@ void renderer_render_light(vec3 position) {
 
     glBindVertexArray(state.cube_vao);
     glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+}
+
+void renderer_render_quad3d(const Transform& transform, Texture texture) {
+    shader_use(state.editor_quad_shader);
+
+    mat4 model = transform.to_mat4();
+    shader_set_uniform_mat4(state.editor_quad_shader, "model", &model);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glBindVertexArray(state.quad3d_vao);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 }

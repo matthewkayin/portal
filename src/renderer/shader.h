@@ -9,6 +9,7 @@ typedef uint32_t Shader;
 bool shader_load(Shader* id, const char* vertex_path, const char* fragment_path);
 void shader_use(Shader id);
 void shader_set_uniform_int(Shader id, const char* name, int value);
+void shader_set_uniform_int_array(Shader id, const char* name, int* value, int count);
 void shader_set_uniform_uint(Shader id, const char* name, uint32_t value);
 void shader_set_uniform_bool(Shader id, const char* name, bool value);
 void shader_set_uniform_float(Shader id, const char* name, float value);

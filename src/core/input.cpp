@@ -6,6 +6,7 @@
 struct InputState {
     ivec2 mouse_position;
     ivec2 mouse_relative_position;
+    int mouse_wheel_motion;
 
     bool current[INPUT_COUNT];
     bool previous[INPUT_COUNT];
@@ -20,6 +21,7 @@ void input_init() {
 
 void input_update() {
     input_state.mouse_relative_position = ivec2(0, 0);
+    input_state.mouse_wheel_motion = 0;
 
     memcpy(&input_state.previous, &input_state.current, sizeof(bool) * INPUT_COUNT);
 }
@@ -47,6 +49,10 @@ void input_process_mouse_motion(ivec2 mouse_position, ivec2 mouse_relative_posit
     input_state.mouse_relative_position = mouse_relative_position;
 }
 
+void input_process_mouse_wheel_motion(int motion) {
+    input_state.mouse_wheel_motion = motion;
+}
+
 bool input_is_action_pressed(Input input) {
     return input_state.current[input];
 }
@@ -65,4 +71,8 @@ ivec2 input_get_mouse_position() {
 
 ivec2 input_get_mouse_relative_position() {
     return input_state.mouse_relative_position;
+}
+
+int input_get_mouse_wheel_motion() {
+    return input_state.mouse_wheel_motion;
 }
